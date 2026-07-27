@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import "./UploadImage.css";
-import { Button, Group } from "@mantine/core";
+import { Button, Group, TextInput } from "@mantine/core";
+
 const UploadImage = ({
   propertyDetails,
   setPropertyDetails,
@@ -9,45 +10,58 @@ const UploadImage = ({
   prevStep,
 }) => {
   const [imageURL, setImageURL] = useState(propertyDetails.image);
-  const cloudinaryRef = useRef();
-  const widgetRef = useRef();
+
   const handleNext = () => {
     setPropertyDetails((prev) => ({ ...prev, image: imageURL }));
     nextStep();
   };
-  useEffect(() => {
-    cloudinaryRef.current = window.cloudinary;
-    widgetRef.current = cloudinaryRef.current.createUploadWidget(
-      {
-        cloudName: "dcdhklrjc",
-        uploadPreset: "vx0dyjgc",
-        maxFiles: 1,
-      },
-      (err, result) => {
-        if (result.event === "success") {
-          setImageURL(result.info.secure_url);
-        }
-      }
-    );
-  }, []);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageURL(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
-    <div className="flexColCenter uploadWrapper">
+    <div className="flexColCenter uploadWrapper" style={{ width: "100%" }}>
       {!imageURL ? (
-        <div
-          className="flexColCenter uploadZone"
-          onClick={() => widgetRef.current?.open()}
-        >
+        <label className="flexColCenter uploadZone" style={{ cursor: "pointer", width: "100%" }}>
+          <input
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
           <AiOutlineCloudUpload size={50} color="grey" />
-          <span>Upload Image</span>
-        </div>
+          <span>Click to Upload Local Image</span>
+        </label>
       ) : (
-        <div
-          className="uploadedImage"
-          onClick={() => widgetRef.current?.open()}
-        >
-          <img src={imageURL} alt="" />
+        <div className="uploadedImage" style={{ position: "relative", width: "100%", display: "flex", justifyContent: "center" }}>
+          <img src={imageURL} alt="Property" style={{ width: "100%", maxHeight: "250px", objectFit: "cover", borderRadius: "10px" }} />
+          <Button 
+            variant="filled" 
+            color="red" 
+            size="xs"
+            style={{ position: "absolute", top: 10, right: 10 }}
+            onClick={() => setImageURL("")}
+          >
+            Remove
+          </Button>
         </div>
       )}
+
+      <TextInput
+        placeholder="Or paste an image URL here..."
+        label="Or Use Image URL"
+        value={imageURL.startsWith("data:") ? "" : imageURL}
+        onChange={(e) => setImageURL(e.target.value)}
+        style={{ width: "100%", marginTop: "1rem" }}
+      />
 
       <Group position="center" mt={"xl"}>
         <Button variant="default" onClick={prevStep}>
