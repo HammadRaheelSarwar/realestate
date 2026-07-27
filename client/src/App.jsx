@@ -13,6 +13,9 @@ import Property from "./pages/Property/Property";
 import UserDetailContext from "./context/UserDetailContext";
 import Bookings from "./pages/Bookings/Bookings";
 import Favourites from "./pages/Favourites/Favourites";
+import Agents from "./pages/Agents/Agents";
+import Blog from "./pages/Blog/Blog";
+import ContactPage from "./pages/ContactPage/ContactPage";
 
 function App() {
   const queryClient = new QueryClient();
@@ -37,6 +40,9 @@ function App() {
                 </Route>
                 <Route path="/bookings" element={<Bookings />} />
                 <Route path="/favourites" element={<Favourites />} />
+                <Route path="/agents" element={<Agents />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/contact" element={<ContactPage />} />
               </Route>
             </Routes>
           </Suspense>

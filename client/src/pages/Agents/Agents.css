@@ -1,0 +1,153 @@
+.agents-wrapper {
+  background: var(--black, #0f0f0f);
+  min-height: 100vh;
+}
+
+.agents-hero {
+  background: linear-gradient(135deg, #1f3e72, #2e599e);
+  padding: 80px 40px;
+  text-align: center;
+}
+
+.agents-hero-text {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.agents-hero-text h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 10px 0;
+}
+
+.agents-hero-text p {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+.agents-container {
+  padding-top: 60px;
+  padding-bottom: 80px;
+}
+
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.agent-card {
+  background: #1a1a2e;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.agent-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.agent-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.agent-info {
+  padding: 20px;
+}
+
+.agent-info h3 {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.agent-title {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+}
+
+.agent-badge {
+  display: inline-block;
+  background: rgba(241,120,15,0.15);
+  color: #f1780f;
+  border: 1px solid rgba(241,120,15,0.3);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.agent-stats {
+  display: flex;
+  gap: 20px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding: 12px 0;
+  margin-bottom: 15px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+
+.stat.rating {
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+}
+
+.stat-value {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.stat-label {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.agent-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.agent-contact a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.agent-contact a:hover {
+  color: #f1780f;
+}
+
+@media (max-width: 768px) {
+  .agents-hero-text h1 {
+    font-size: 1.8rem;
+  }
+
+  .agents-grid {
+    grid-template-columns: 1fr;
+  }
+}

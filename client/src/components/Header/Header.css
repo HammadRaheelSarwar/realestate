@@ -11,10 +11,15 @@
 }
 
 .h-menu {
-  gap: 2rem;
+  gap: 1.4rem;
 }
 .h-menu > *:hover {
   cursor: pointer;
+  color: var(--orange);
+}
+.h-menu a.active {
+  color: var(--orange);
+  font-weight: 700;
 }
 .menu-icon {
   display: none;

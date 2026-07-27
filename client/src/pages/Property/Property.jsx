@@ -17,6 +17,7 @@ import UserDetailContext from "../../context/UserDetailContext.js";
 import { Button } from "@mantine/core";
 import { toast } from "react-toastify";
 import Heart from "../../components/Heart/Heart";
+import MortgageCalculator from "../../components/MortgageCalculator/MortgageCalculator";
 const Property = () => {
   const { pathname } = useLocation();
   const id = pathname.split("/").slice(-1)[0];
@@ -159,6 +160,8 @@ const Property = () => {
               propertyId={id}
               email={user?.email}
             />
+
+            <MortgageCalculator price={data?.price} />
           </div>
 
           {/* right side */}

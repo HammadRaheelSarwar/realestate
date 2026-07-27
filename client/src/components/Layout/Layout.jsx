@@ -9,6 +9,9 @@ import { createUser } from "../../utils/api";
 import useFavourites from "../../hooks/useFavourites";
 import useBookings from "../../hooks/useBookings";
 
+import WhatsAppButton from "../WhatsAppButton/WhatsAppButton";
+import AIChatAssistant from "../AIChatAssistant/AIChatAssistant";
+
 const Layout = () => {
 
   useFavourites()
@@ -46,6 +49,8 @@ const Layout = () => {
         <Header />
         <Outlet />
       </div>
+      <WhatsAppButton />
+      <AIChatAssistant />
       <Footer />
     </>
   );

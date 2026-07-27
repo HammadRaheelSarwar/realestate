@@ -43,16 +43,9 @@ const Header = () => {
             style={getMenuStyles(menuOpened)}
           >
             <NavLink to="/properties">Properties</NavLink>
-
-            <a href="/#contact-us" onClick={(e) => {
-              e.preventDefault();
-              const contactSection = document.getElementById("contact-us");
-              if (contactSection) {
-                contactSection.scrollIntoView({ behavior: "smooth" });
-              } else {
-                window.location.href = "/#contact-us";
-              }
-            }}>Contact</a>
+            <NavLink to="/agents">Agents</NavLink>
+            <NavLink to="/blog">Blog</NavLink>
+            <NavLink to="/contact">Contact</NavLink>
 
             {/* add property */}
             <div onClick={handleAddPropertyClick}>Add Property</div>
