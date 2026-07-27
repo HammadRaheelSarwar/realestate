@@ -4,75 +4,106 @@ import { AiOutlineClose, AiOutlineSend } from "react-icons/ai";
 import { initialProperties } from "../../utils/propertiesData";
 import "./AIChatAssistant.css";
 
+const COHERE_API_KEY = "AQ.Ab8RN6JxGyct4x2PVImrXQvTboUCKF3iJpISVmfnKHMZXj6siA";
+const COHERE_API_URL = "https://api.cohere.com/v2/chat";
+
+// Build a compact property context from site data
+const buildPropertyContext = () => {
+  const props = JSON.parse(localStorage.getItem("properties0") || "null") || initialProperties;
+  return props
+    .map(
+      (p) =>
+        `ID:${p.id} | Title:${p.title} | City:${p.city} | Address:${p.address} | Price:$${p.price}/mo | Bedrooms:${p.facilities?.bedrooms ?? "N/A"} | Bathrooms:${p.facilities?.bathrooms ?? "N/A"} | Parking:${p.facilities?.parkings ?? "N/A"} | Description:${p.description?.slice(0, 120) ?? ""}`
+    )
+    .join("\n");
+};
+
+const SYSTEM_PROMPT = `You are a helpful AI real estate assistant for Homyz, a property listing website.
+You ONLY answer questions based on the property listings provided below.
+Do NOT make up properties or prices not listed here.
+If the user asks about something not in the data, say you only have information about the listed properties.
+Keep answers concise, friendly, and helpful.
+If relevant, mention the property title, city, price, and facilities.
+
+AVAILABLE PROPERTIES ON THIS WEBSITE:
+${buildPropertyContext()}`;
+
 const AIChatAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       sender: "bot",
-      text: "Hello! I am your AI assistant. How can I help you find your dream home today?",
+      text: "👋 Hi! I'm your AI real estate assistant powered by Cohere. Ask me about properties, pricing, cities, bedrooms, or anything about listings on this site!",
     },
   ]);
   const [inputValue, setInputValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const chatEndRef = useRef(null);
+
+  // Build chat history for Cohere (only user/assistant turns)
+  const buildChatHistory = () =>
+    messages
+      .filter((m) => m.sender !== "error")
+      .map((m) => ({
+        role: m.sender === "user" ? "user" : "assistant",
+        content: m.text,
+      }));
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isOpen]);
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
+  const handleSend = async () => {
+    if (!inputValue.trim() || isLoading) return;
 
-    const userMessage = { sender: "user", text: inputValue };
-    setMessages((prev) => [...prev, userMessage]);
+    const userText = inputValue.trim();
     setInputValue("");
+    setMessages((prev) => [...prev, { sender: "user", text: userText }]);
+    setIsLoading(true);
 
-    setTimeout(() => {
-      const response = generateAIResponse(inputValue);
-      setMessages((prev) => [...prev, { sender: "bot", text: response }]);
-    }, 1000);
-  };
+    try {
+      const history = buildChatHistory();
 
-  const generateAIResponse = (input) => {
-    const text = input.toLowerCase();
+      const response = await fetch(COHERE_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${COHERE_API_KEY}`,
+          "X-Client-Name": "homyz-real-estate",
+        },
+        body: JSON.stringify({
+          model: "command-r-plus",
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            ...history,
+            { role: "user", content: userText },
+          ],
+        }),
+      });
 
-    // Check for cities
-    const cities = ["chicago", "multan", "karachi", "san diego", "phoenix", "tampa", "denver", "tokyo", "delhi", "los angeles", "new york", "lahore", "mumbai"];
-    const matchedCity = cities.find((city) => text.includes(city));
-
-    if (matchedCity) {
-      const cityProps = initialProperties.filter(
-        (p) => p.city.toLowerCase().trim() === matchedCity
-      );
-      if (cityProps.length > 0) {
-        return `I found ${cityProps.length} properties in ${matchedCity.toUpperCase()}:\n` +
-          cityProps.map((p) => `- ${p.title} ($${p.price})`).join("\n") +
-          "\n\nLet me know if you want to know more about any of these!";
-      } else {
-        return `Currently, we don't have any listings in ${matchedCity.toUpperCase()}. Would you like to check out another city?`;
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
       }
-    }
 
-    if (text.includes("price") || text.includes("cost") || text.includes("how much")) {
-      return "Property prices range from $2,000 to $10,000. You can type the name of a city (e.g. 'New York') or a property title to see specific pricing.";
-    }
+      const data = await response.json();
+      const botReply =
+        data?.message?.content?.[0]?.text ||
+        data?.text ||
+        "Sorry, I couldn't get a response. Please try again.";
 
-    if (text.includes("hello") || text.includes("hi ") || text.includes("hey")) {
-      return "Hi there! Feel free to ask about our properties, cities, pricing, or how to book a visit!";
+      setMessages((prev) => [...prev, { sender: "bot", text: botReply }]);
+    } catch (err) {
+      console.error("Cohere API error:", err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "⚠️ I'm having trouble connecting right now. Please try again in a moment.",
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
     }
-
-    if (text.includes("book") || text.includes("visit")) {
-      return "To book a visit, select a property and click the 'Book your visit' button on the property details page. You will need to log in to complete the booking.";
-    }
-
-    // Direct property search
-    const matchedProperty = initialProperties.find((p) =>
-      text.includes(p.title.toLowerCase())
-    );
-    if (matchedProperty) {
-      return `"${matchedProperty.title}" is located at ${matchedProperty.address}, ${matchedProperty.city}. It features ${matchedProperty.facilities.bedrooms} bedrooms and ${matchedProperty.facilities.bathrooms} bathrooms, priced at $${matchedProperty.price}/month. Would you like to know more?`;
-    }
-
-    return "I'm not sure I understand that. You can ask me about properties in a specific city (e.g. 'properties in New York'), pricing details, or how to book a visit!";
   };
 
   return (
@@ -88,7 +119,10 @@ const AIChatAssistant = () => {
       {isOpen && (
         <div className="chat-window">
           <div className="chat-header">
-            <h3>AI Real Estate Assistant</h3>
+            <div className="chat-header-info">
+              <span className="chat-status-dot" />
+              <h3>AI Real Estate Assistant</h3>
+            </div>
             <button className="close-btn" onClick={() => setIsOpen(false)}>
               <AiOutlineClose />
             </button>
@@ -99,20 +133,29 @@ const AIChatAssistant = () => {
                 <div className="message-text">{msg.text}</div>
               </div>
             ))}
+            {isLoading && (
+              <div className="message-wrapper bot">
+                <div className="message-text typing-indicator">
+                  <span /><span /><span />
+                </div>
+              </div>
+            )}
             <div ref={chatEndRef} />
           </div>
           <div className="chat-footer">
             <input
               type="text"
-              placeholder="Ask about properties, cities..."
+              placeholder="Ask about properties, cities, prices..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              disabled={isLoading}
             />
-            <button className="send-btn" onClick={handleSend}>
+            <button className="send-btn" onClick={handleSend} disabled={isLoading}>
               <AiOutlineSend />
             </button>
           </div>
+          <div className="chat-powered-by">Powered by Cohere AI · Only answers from this site</div>
         </div>
       )}
     </div>
