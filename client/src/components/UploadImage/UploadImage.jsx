@@ -58,7 +58,7 @@ const UploadImage = ({
       <TextInput
         placeholder="Or paste an image URL here..."
         label="Or Use Image URL"
-        value={imageURL.startsWith("data:") ? "" : imageURL}
+        value={(imageURL && typeof imageURL === "string" && imageURL.startsWith("data:")) ? "" : (imageURL || "")}
         onChange={(e) => setImageURL(e.target.value)}
         style={{ width: "100%", marginTop: "1rem" }}
       />
