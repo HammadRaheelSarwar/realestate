@@ -21,3 +21,7 @@ app.listen(PORT, ()=> {
 
 app.use('/api/user', userRoute)
 app.use("/api/residency", residencyRoute)
+
+app.get("/", (req, res) => {
+    res.send("Real Estate API Server is running successfully!");
+});
