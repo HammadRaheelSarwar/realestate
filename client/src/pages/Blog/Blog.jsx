@@ -90,11 +90,20 @@ const Blog = () => {
   return (
     <div className="blog-wrapper">
       <div className="blog-hero">
-        <span className="orangeText">Our Blog</span>
-        <h1 className="primaryText">Real Estate Insights & Tips</h1>
-        <p className="secondaryText">
-          Stay informed with the latest trends, tips, and news in the real estate world.
-        </p>
+        <div className="blog-hero-left">
+          <span className="orangeText">Our Blog</span>
+          <h1 className="primaryText">Real Estate Insights & Tips</h1>
+          <p className="secondaryText">
+            Stay informed with the latest trends, tips, and news in the real estate world.
+          </p>
+        </div>
+        <div className="blog-hero-right">
+          <img
+            src="https://images.pexels.com/photos/1642125/pexels-photo-1642125.jpeg?auto=compress&cs=tinysrgb&w=800"
+            alt="Real Estate Blog"
+            className="hero-section-img"
+          />
+        </div>
       </div>
       <div className="innerWidth paddings blog-container">
         <div className="blog-grid">

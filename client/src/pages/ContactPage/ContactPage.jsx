@@ -35,14 +35,22 @@ const ContactPage = () => {
 
   return (
     <div className="contact-page-wrapper">
-      {/* Hero */}
       <div className="contact-page-hero">
-        <span className="orangeText">Get In Touch</span>
-        <h1 className="primaryText">Contact Our Team</h1>
-        <p className="secondaryText">
-          Have questions about a property? Ready to start your real estate journey?
-          Our expert team is here to help you every step of the way.
-        </p>
+        <div className="contact-hero-left">
+          <span className="orangeText">Get In Touch</span>
+          <h1 className="primaryText">Contact Our Team</h1>
+          <p className="secondaryText">
+            Have questions about a property? Ready to start your real estate journey?
+            Our expert team is here to help you every step of the way.
+          </p>
+        </div>
+        <div className="contact-hero-right">
+          <img
+            src="https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg?auto=compress&cs=tinysrgb&w=800"
+            alt="Contact Us"
+            className="hero-section-img"
+          />
+        </div>
       </div>
 
       <div className="innerWidth paddings contact-page-body">

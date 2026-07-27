@@ -4,23 +4,47 @@
 }
 
 .contact-page-hero {
-  text-align: center;
-  padding: 80px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 60px 80px;
   background: linear-gradient(135deg, #1f3e72, #2e599e);
+  overflow: hidden;
 }
 
-.contact-page-hero h1 {
+.contact-hero-left {
+  flex: 1;
+  text-align: left;
+}
+
+.contact-hero-left h1 {
   font-size: 2.5rem;
   font-weight: 800;
   color: #fff;
   margin: 10px 0;
 }
 
-.contact-page-hero p {
+.contact-hero-left p {
   color: rgba(255,255,255,0.75);
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 480px;
   line-height: 1.8;
+}
+
+.contact-hero-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.hero-section-img {
+  width: 100%;
+  max-width: 460px;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  border: 2px solid rgba(255,255,255,0.1);
 }
 
 .contact-page-body {
