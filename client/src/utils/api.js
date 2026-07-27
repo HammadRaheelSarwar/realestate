@@ -1,21 +1,46 @@
-import axios from "axios";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
+import { initialProperties } from "./propertiesData";
 
-export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "/api",
-});
+// Helper to load properties from localStorage or initialize
+const getStoredProperties = () => {
+  let data = localStorage.getItem("properties");
+  if (!data) {
+    data = JSON.stringify(initialProperties);
+    localStorage.setItem("properties", data);
+  }
+  return JSON.parse(data);
+};
+
+// Helper to save properties to localStorage
+const saveProperties = (properties) => {
+  localStorage.setItem("properties", JSON.stringify(properties));
+};
+
+// Helper to load user profile (favorites/bookings) from localStorage
+const getStoredUser = (email) => {
+  let users = JSON.parse(localStorage.getItem("users") || "{}");
+  if (!users[email]) {
+    users[email] = {
+      email,
+      bookedVisits: [],
+      favResidenciesID: []
+    };
+    localStorage.setItem("users", JSON.stringify(users));
+  }
+  return users[email];
+};
+
+// Helper to save user profile to localStorage
+const saveUser = (email, userData) => {
+  let users = JSON.parse(localStorage.getItem("users") || "{}");
+  users[email] = userData;
+  localStorage.setItem("users", JSON.stringify(users));
+};
 
 export const getAllProperties = async () => {
   try {
-    const response = await api.get("/residency/allresd", {
-      timeout: 10 * 1000,
-    });
-
-    if (response.status === 400 || response.status === 500) {
-      throw response.data;
-    }
-    return response.data;
+    return getStoredProperties();
   } catch (error) {
     toast.error("Something went wrong");
     throw error;
@@ -24,14 +49,10 @@ export const getAllProperties = async () => {
 
 export const getProperty = async (id) => {
   try {
-    const response = await api.get(`/residency/${id}`, {
-      timeout: 10 * 1000,
-    });
-
-    if (response.status === 400 || response.status === 500) {
-      throw response.data;
-    }
-    return response.data;
+    const properties = getStoredProperties();
+    const property = properties.find((p) => p.id === id);
+    if (!property) throw new Error("Property not found");
+    return property;
   } catch (error) {
     toast.error("Something went wrong");
     throw error;
@@ -40,15 +61,7 @@ export const getProperty = async (id) => {
 
 export const createUser = async (email, token) => {
   try {
-    await api.post(
-      `/user/register`,
-      { email },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    getStoredUser(email);
   } catch (error) {
     toast.error("Something went wrong, Please try again");
     throw error;
@@ -57,19 +70,16 @@ export const createUser = async (email, token) => {
 
 export const bookVisit = async (date, propertyId, email, token) => {
   try {
-    await api.post(
-      `/user/bookVisit/${propertyId}`,
-      {
-        email,
-        id: propertyId,
-        date: dayjs(date).format("DD/MM/YYYY"),
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const user = getStoredUser(email);
+    if (user.bookedVisits.some((b) => b.id === propertyId)) {
+      throw new Error("Already booked");
+    }
+    user.bookedVisits.push({
+      id: propertyId,
+      date: dayjs(date).format("DD/MM/YYYY"),
+    });
+    saveUser(email, user);
+    toast.success("Visit booked successfully");
   } catch (error) {
     toast.error("Something went wrong, Please try again");
     throw error;
@@ -78,110 +88,66 @@ export const bookVisit = async (date, propertyId, email, token) => {
 
 export const removeBooking = async (id, email, token) => {
   try {
-    await api.post(
-      `/user/removeBooking/${id}`,
-      {
-        email,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const user = getStoredUser(email);
+    user.bookedVisits = user.bookedVisits.filter((b) => b.id !== id);
+    saveUser(email, user);
+    toast.success("Booking removed");
   } catch (error) {
     toast.error("Something went wrong, Please try again");
-
     throw error;
   }
 };
 
 export const toFav = async (id, email, token) => {
   try {
-    await api.post(
-      `/user/toFav/${id}`,
-      {
-        email,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const user = getStoredUser(email);
+    if (user.favResidenciesID.includes(id)) {
+      user.favResidenciesID = user.favResidenciesID.filter((favId) => favId !== id);
+      toast.info("Removed from favorites");
+    } else {
+      user.favResidenciesID.push(id);
+      toast.success("Added to favorites");
+    }
+    saveUser(email, user);
   } catch (e) {
     throw e;
   }
 };
 
-
 export const getAllFav = async (email, token) => {
-  if(!token) return 
-  try{
-
-    const res = await api.post(
-      `/user/allFav`,
-      {
-        email,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-      
-    return res.data["favResidenciesID"]
-
-  }catch(e)
-  {
+  try {
+    const user = getStoredUser(email);
+    return user.favResidenciesID;
+  } catch (e) {
     toast.error("Something went wrong while fetching favs");
-    throw e
+    throw e;
   }
-} 
-
+};
 
 export const getAllBookings = async (email, token) => {
-  
-  if(!token) return 
   try {
-    const res = await api.post(
-      `/user/allBookings`,
-      {
-        email,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return res.data["bookedVisits"];
-
-    
+    const user = getStoredUser(email);
+    return user.bookedVisits;
   } catch (error) {
     toast.error("Something went wrong while fetching bookings");
-    throw error
+    throw error;
   }
-}
-
+};
 
 export const createResidency = async (data, token) => {
-  console.log(data)
-  try{
-    const res = await api.post(
-      `/residency/create`,
-      {
-        data
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-  }catch(error)
-  {
-    throw error
+  try {
+    const properties = getStoredProperties();
+    const newProperty = {
+      id: Math.random().toString(36).substring(2, 9),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      ...data
+    };
+    properties.push(newProperty);
+    saveProperties(properties);
+    toast.success("Residency created successfully");
+  } catch (error) {
+    toast.error("Something went wrong while creating residency");
+    throw error;
   }
-}
+};
