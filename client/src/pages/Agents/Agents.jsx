@@ -110,7 +110,7 @@ const Agents = () => {
   return (
     <div className="agents-wrapper">
       <div className="agents-hero">
-        <div className="agents-hero-left">
+        <div className="agents-hero-overlay">
           <span className="orangeText">Our Team</span>
           <h1 className="primaryText">Meet Our Expert Agents</h1>
           <p className="secondaryText">
@@ -118,13 +118,6 @@ const Agents = () => {
             find your perfect home. With years of experience and local market
             expertise, we make your real estate journey seamless.
           </p>
-        </div>
-        <div className="agents-hero-right">
-          <img
-            src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800"
-            alt="Our Expert Agents"
-            className="hero-section-img"
-          />
         </div>
       </div>
       <div className="innerWidth paddings agents-container">
