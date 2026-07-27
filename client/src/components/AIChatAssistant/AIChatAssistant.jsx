@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { BsFillChatDotsFill } from "react-icons/icons"; // Wait, BsFillChatDotsFill is in react-icons/bs!
-// Let's use react-icons/bs instead
 import { BsFillChatSquareDotsFill } from "react-icons/bs";
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai";
 import { initialProperties } from "../../utils/propertiesData";
