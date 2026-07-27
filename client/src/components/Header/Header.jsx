@@ -44,7 +44,15 @@ const Header = () => {
           >
             <NavLink to="/properties">Properties</NavLink>
 
-            <a href="mailto:zainkeepscode@gmail.com">Contact</a>
+            <a href="/#contact-us" onClick={(e) => {
+              e.preventDefault();
+              const contactSection = document.getElementById("contact-us");
+              if (contactSection) {
+                contactSection.scrollIntoView({ behavior: "smooth" });
+              } else {
+                window.location.href = "/#contact-us";
+              }
+            }}>Contact</a>
 
             {/* add property */}
             <div onClick={handleAddPropertyClick}>Add Property</div>
